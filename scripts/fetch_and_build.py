@@ -368,6 +368,7 @@ def build(date: str) -> str:
 </main>
 <footer>
   <p>Sources: <a href="https://clickthecity.com">ClickTheCity</a> &amp; <a href="https://www.popcorn.app">popcorn.app</a>, cross-referenced. Refreshed 3x daily.</p>
+  <p>Built by <a href="https://ngpestelos.com">ngpestelos.com</a></p>
 </footer>
 </body>
 </html>
