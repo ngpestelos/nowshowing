@@ -331,7 +331,7 @@ def build(date: str) -> str:
     _imdb_year_hint = int(date[:4])
     now_dt = datetime.datetime.now(MANILA)
     now_minutes = now_dt.hour * 60 + now_dt.minute
-    sections = []
+    sections = []  # list of (display_name, html) — sorted by name before assembly
     for theater in THEATERS:
         slug = theater["ctc_slug"]
         ctc_data = fetch_ctc(slug, date)
@@ -351,14 +351,19 @@ def build(date: str) -> str:
                 )
             else:
                 source_note = "Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today"
-            sections.append(render_theater(ctc_data["theater"]["name"], ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes))
+            name = ctc_data["theater"]["name"]
+            sections.append((name, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes)))
         elif pc_idx is not None:
-            sections.append(render_theater_fallback(slug.replace("-", " ").title(), pc_idx))
+            name = slug.replace("-", " ").title()
+            sections.append((name, render_theater_fallback(name, pc_idx)))
         else:
-            sections.append(
+            sections.append((
+                slug,
                 f'<section class="theater theater-error"><p>Could not load schedule for '
-                f'<code>{html.escape(slug)}</code> today (both sources failed).</p></section>'
-            )
+                f'<code>{html.escape(slug)}</code> today (both sources failed).</p></section>',
+            ))
+    sections.sort(key=lambda s: natural_sort_key(s[0]))
+    sections = [html_str for _, html_str in sections]
     now = datetime.datetime.now(MANILA).strftime("%Y-%m-%d %H:%M %Z")
     return f"""<!doctype html>
 <html lang="en">
