@@ -378,8 +378,8 @@ def build(date: str) -> str:
 def main():
     date = datetime.datetime.now(MANILA).strftime("%Y-%m-%d")
     html_out = build(date)
-    (REPO_ROOT / "index.html").write_text(html_out, encoding="utf-8")
-    print(f"Wrote index.html for {date}")
+    (REPO_ROOT / "public" / "index.html").write_text(html_out, encoding="utf-8")
+    print(f"Wrote public/index.html for {date}")
 
 
 if __name__ == "__main__":
