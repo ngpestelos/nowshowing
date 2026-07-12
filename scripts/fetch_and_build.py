@@ -56,6 +56,64 @@ def normalize_time(t: str) -> str:
     return f"{m.group(1)}:{m.group(2)}{m.group(3)}" if m else t
 
 
+IMDB_SUGGESTION_URL = "https://v3.sg.media-imdb.com/suggestion/{first_char}/{query}.json"
+_imdb_cache: dict[str, tuple[str, bool] | None] = {}
+_imdb_year_hint = None  # set once per build() run from the schedule date
+
+
+def _fetch_imdb_id(title: str) -> tuple[str, bool] | None:
+    """Returns (tt_id, is_ambiguous). A remake/re-release (e.g. "Moana" 2026)
+    will exact-title-collide with the decades-old original on IMDb, but that's
+    not real ambiguity — only one candidate is recent enough to be the one
+    actually in cinemas now. Genuine ambiguity is 2+ RECENT exact-title
+    matches (e.g. two different 2025/2026 films both called "The Furious"),
+    where we can't tell which one this listing means from the title alone."""
+    query = re.sub(r"[^\w\s]", "", title.lower()).strip()
+    query = re.sub(r"\s+", "_", query)
+    if not query:
+        return None
+    url = IMDB_SUGGESTION_URL.format(first_char=query[0], query=query)
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.load(resp)
+    except Exception as e:
+        print(f"WARN: IMDb lookup failed for {title!r}: {e}")
+        return None
+    target = normalize_title(title)
+    exact_matches = [
+        item for item in data.get("d", [])
+        if item.get("qid") == "movie" and normalize_title(item.get("l", "")) == target
+    ]
+    if not exact_matches:
+        return None
+    recent = [m for m in exact_matches if isinstance(m.get("y"), int) and m["y"] >= _imdb_year_hint - 1]
+    if len(recent) == 1:
+        return recent[0]["id"], False
+    return exact_matches[0]["id"], True
+
+
+def imdb_lookup(title: str) -> tuple[str, bool] | None:
+    key = normalize_title(title)
+    if key not in _imdb_cache:
+        _imdb_cache[key] = _fetch_imdb_id(title)
+    return _imdb_cache[key]
+
+
+def imdb_link_html(imdb: tuple | None) -> str:
+    if imdb is None:
+        return ""
+    tt_id, ambiguous = imdb
+    if ambiguous:
+        cls, tip = "imdb-link imdb-ambiguous", "Best guess — multiple IMDb entries share this title"
+    else:
+        cls, tip = "imdb-link", "View on IMDb"
+    return (
+        f' <a class="{cls}" href="https://www.imdb.com/title/{html.escape(tt_id)}/" '
+        f'target="_blank" rel="noopener" title="{html.escape(tip)}">IMDb</a>'
+    )
+
+
 def minutes_since_midnight(t: str) -> int:
     """t must already be normalize_time()'d, e.g. '11:40AM'."""
     m = re.match(r"^(\d{1,2}):(\d{2})(AM|PM)$", t)
@@ -198,9 +256,10 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
         rating = html.escape(entry["rating"])
         runtime = html.escape(entry["runtime"])
         badge = cross_check_badge(entry["showtimes"], pc_idx.get(key), now_minutes)
+        imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         for cinema, showtimes in entry["cinema_rows"]:
             rows.append(
-                f'<tr><td class="title" data-label="Movie">{title} {badge}</td>'
+                f'<tr><td class="title" data-label="Movie">{title}{imdb} {badge}</td>'
                 f'<td class="meta" data-label="Rating / Runtime">{rating} &middot; {runtime}</td>'
                 f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
                 f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
@@ -234,9 +293,10 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
     rows = []
     for entry in pc.values():
         title = html.escape(entry["raw_title"])
+        imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         showtimes = ", ".join(sorted(entry["showtimes"]))
         rows.append(
-            f'<tr><td class="title" data-label="Movie">{title}</td>'
+            f'<tr><td class="title" data-label="Movie">{title}{imdb}</td>'
             f'<td class="meta" data-label="Rating / Runtime">&mdash;</td>'
             f'<td class="cinema" data-label="Cinema">&mdash;</td>'
             f'<td class="showtimes" data-label="Showtimes">{showtimes}</td></tr>'
@@ -257,6 +317,8 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
 
 
 def build(date: str) -> str:
+    global _imdb_year_hint
+    _imdb_year_hint = int(date[:4])
     now_dt = datetime.datetime.now(MANILA)
     now_minutes = now_dt.hour * 60 + now_dt.minute
     sections = []

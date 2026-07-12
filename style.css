@@ -90,6 +90,21 @@ header h1 {
   .badge-partial { background: #ffcc4d33; color: #ffcc4d; }
 }
 
+.imdb-link {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #f5c518;
+  background: #1a1a1a;
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.2rem;
+  text-decoration: none;
+  vertical-align: middle;
+  margin-left: 0.35rem;
+}
+
+.imdb-link:hover { opacity: 0.85; }
+.imdb-link.imdb-ambiguous { border: 1px dashed #f5c518; }
+
 table {
   width: 100%;
   border-collapse: collapse;
