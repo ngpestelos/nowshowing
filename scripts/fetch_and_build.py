@@ -50,6 +50,12 @@ def normalize_title(title: str) -> str:
     return t
 
 
+def natural_sort_key(s: str) -> list:
+    """Case-insensitive, numeric-aware sort key so 'Cinema 2' sorts before
+    'Cinema 10' instead of after it (plain string sort would put '10' first)."""
+    return [int(p) if p.isdigit() else p.lower() for p in re.split(r"(\d+)", s)]
+
+
 def normalize_time(t: str) -> str:
     t = t.upper().replace(" ", "")
     m = re.match(r"^0?(\d{1,2}):(\d{2})(AM|PM)$", t)
@@ -250,20 +256,24 @@ def cross_check_badge(ctc_times: set, pc_entry: dict | None, now_minutes: int) -
 
 def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_note: str, now_minutes: int) -> str:
     pc_idx = pc if pc is not None else {}
-    rows = []
+    rows_data = []
     for key, entry in ctc.items():
-        title = html.escape(entry["raw_title"])
-        rating = html.escape(entry["rating"])
-        runtime = html.escape(entry["runtime"])
         badge = cross_check_badge(entry["showtimes"], pc_idx.get(key), now_minutes)
         imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         for cinema, showtimes in entry["cinema_rows"]:
-            rows.append(
-                f'<tr><td class="title" data-label="Movie">{title}{imdb} {badge}</td>'
-                f'<td class="meta" data-label="Rating / Runtime">{rating} &middot; {runtime}</td>'
-                f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
-                f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
-            )
+            rows_data.append((cinema, entry["raw_title"], entry["rating"], entry["runtime"], badge, imdb, showtimes))
+
+    # sort by cinema (natural order), then by movie name within each cinema
+    rows_data.sort(key=lambda r: (natural_sort_key(r[0]), r[1].lower()))
+
+    rows = []
+    for cinema, title, rating, runtime, badge, imdb, showtimes in rows_data:
+        rows.append(
+            f'<tr><td class="title" data-label="Movie">{html.escape(title)}{imdb} {badge}</td>'
+            f'<td class="meta" data-label="Rating / Runtime">{html.escape(rating)} &middot; {html.escape(runtime)}</td>'
+            f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
+            f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
+        )
     rows_html = "\n".join(rows) if rows else '<tr><td colspan="4" class="empty">No schedule available today.</td></tr>'
     missing_from_ctc = [e["raw_title"] for k, e in pc_idx.items() if k not in ctc]
     extra_note = ""
@@ -291,7 +301,7 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
 
 def render_theater_fallback(name_hint: str, pc: dict) -> str:
     rows = []
-    for entry in pc.values():
+    for entry in sorted(pc.values(), key=lambda e: e["raw_title"].lower()):
         title = html.escape(entry["raw_title"])
         imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         showtimes = ", ".join(sorted(entry["showtimes"]))
