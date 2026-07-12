@@ -27,6 +27,10 @@ THEATERS = [
         "ctc_slug": "ortigas-cinemas-estancia",
         "popcorn_url": "https://www.popcorn.app/ph/ortigas-cinema/estancia-cinemas/cinema/2766",
     },
+    {
+        "ctc_slug": "robinsons-place-manila",
+        "popcorn_url": "https://www.popcorn.app/ph/robinsons/manila/cinema/552",
+    },
 ]
 
 CTC_API_URL = "https://clickthecity.com/api/movies/theater/{slug}?date={date}"
