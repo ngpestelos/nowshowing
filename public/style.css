@@ -162,6 +162,13 @@ th {
 
 .title { font-weight: 600; }
 .meta, .cinema { color: var(--muted); }
+.price { white-space: nowrap; }
+.price-unavailable {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: help;
+}
 .empty { color: var(--muted); font-style: italic; }
 
 .theater-error {

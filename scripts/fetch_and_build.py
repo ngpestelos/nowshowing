@@ -18,20 +18,57 @@ THEATERS = [
     {
         "ctc_slug": "robinsons-galleria-ortigas",
         "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/galleria-ortigas/cinema/550",
+        "fallback_name": "Robinsons Galleria Ortigas",
     },
     {
         "ctc_slug": "power-plant-mall",
         "popcorn_url": "https://www.popcorn.app/ph/powerplant/power-plant-mall/cinema/2633",
+        "fallback_name": "Power Plant",  # matches ClickTheCity's own name, NOT slug.title() ("Power Plant Mall")
     },
     {
         "ctc_slug": "ortigas-cinemas-estancia",
         "popcorn_url": "https://www.popcorn.app/ph/ortigas-cinema/estancia-cinemas/cinema/2766",
+        "fallback_name": "Ortigas Cinemas Estancia",
     },
     {
         "ctc_slug": "robinsons-place-manila",
         "popcorn_url": "https://www.popcorn.app/ph/robinsons/manila/cinema/552",
+        "fallback_name": "Robinsons Place Manila",
     },
 ]
+
+# Per-seat ticket prices (PHP), verified directly against each operator's own
+# booking site — not a live daily fetch. Both theaters here run the same
+# Vista Entertainment ticketing platform (ortigascinemas.com /
+# tickets.powerplantcinema.com), confirmed by pulling a real session's
+# checkout page. Regular vs premium is a tier, not a per-room price — a
+# cinema room's NAME is classified into a tier via keyword match below.
+# Robinsons Movieworld (Robinsons Galleria Ortigas, Robinsons Place Manila)
+# runs a different, custom booking backend that doesn't expose price without
+# going through a reCAPTCHA-gated flow, which this script won't automate
+# around — those theaters show "Price unavailable" rather than a guess.
+# Ticket prices change infrequently; re-verify periodically, not per-run.
+THEATER_PRICING = {
+    "Ortigas Cinemas Estancia": {"regular": 440.00, "premium": 590.00, "verified": "2026-07-12"},
+    "Power Plant": {"regular": 470.00, "premium": None, "verified": "2026-07-12"},
+}
+PREMIUM_CINEMA_KEYWORDS = ["screening room", "vip", "premiere", "dolby atmos", "imax"]
+
+
+def price_for_cinema(theater_name: str, cinema_name: str) -> float | None:
+    pricing = THEATER_PRICING.get(theater_name)
+    if pricing is None:
+        return None
+    tier = "premium" if any(k in cinema_name.lower() for k in PREMIUM_CINEMA_KEYWORDS) else "regular"
+    return pricing.get(tier)
+
+
+def price_html(theater_name: str, cinema_name: str) -> str:
+    price = price_for_cinema(theater_name, cinema_name)
+    if price is None:
+        return '<span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span>'
+    return f"&#8369;{price:,.2f}"
+
 
 CTC_API_URL = "https://clickthecity.com/api/movies/theater/{slug}?date={date}"
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -277,9 +314,10 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
             f'<td class="title" data-label="Movie">{html.escape(title)}{imdb} {badge}</td>'
             f'<td class="meta" data-label="Rating / Runtime">{html.escape(rating)} &middot; {html.escape(runtime)}</td>'
             f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
+            f'<td class="price" data-label="Ticket Price">{price_html(name, cinema)}</td>'
             f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
         )
-    rows_html = "\n".join(rows) if rows else '<tr><td colspan="4" class="empty">No schedule available today.</td></tr>'
+    rows_html = "\n".join(rows) if rows else '<tr><td colspan="5" class="empty">No schedule available today.</td></tr>'
     missing_from_ctc = [e["raw_title"] for k, e in pc_idx.items() if k not in ctc]
     extra_note = ""
     if missing_from_ctc:
@@ -288,13 +326,20 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
             f'{", ".join(html.escape(t) for t in missing_from_ctc)} at this theater today — '
             f"not found on ClickTheCity.</p>"
         )
+    pricing = THEATER_PRICING.get(name)
+    price_note = (
+        f'<p class="source-note">Ticket prices verified {pricing["verified"]} against the operator\'s own booking site &mdash; a dated snapshot, not fetched live.</p>'
+        if pricing else
+        '<p class="source-note">No verified ticket-price source for this theater.</p>'
+    )
     return f"""
     <section class="theater" data-theater="{html.escape(name)}">
       <h2>{html.escape(name)}</h2>
       <p class="address">{html.escape(address)}</p>
       <p class="source-note">{source_note}</p>
+      {price_note}
       <table>
-        <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Showtimes</th></tr></thead>
+        <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Ticket Price</th><th>Showtimes</th></tr></thead>
         <tbody>
         {rows_html}
         </tbody>
@@ -315,15 +360,16 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
             f'<td class="title" data-label="Movie">{title}{imdb}</td>'
             f'<td class="meta" data-label="Rating / Runtime">&mdash;</td>'
             f'<td class="cinema" data-label="Cinema">&mdash;</td>'
+            f'<td class="price" data-label="Ticket Price">{price_html(name_hint, "")}</td>'
             f'<td class="showtimes" data-label="Showtimes">{showtimes}</td></tr>'
         )
-    rows_html = "\n".join(rows) if rows else '<tr><td colspan="4" class="empty">No schedule available today.</td></tr>'
+    rows_html = "\n".join(rows) if rows else '<tr><td colspan="5" class="empty">No schedule available today.</td></tr>'
     return f"""
     <section class="theater" data-theater="{html.escape(name_hint)}">
       <h2>{html.escape(name_hint)}</h2>
       <p class="source-note theater-error">ClickTheCity unavailable today &mdash; showing popcorn.app data only (no per-screen breakdown, ratings/runtime not provided by this source).</p>
       <table>
-        <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Showtimes</th></tr></thead>
+        <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Ticket Price</th><th>Showtimes</th></tr></thead>
         <tbody>
         {rows_html}
         </tbody>
@@ -360,7 +406,7 @@ def build(date: str) -> str:
             name = ctc_data["theater"]["name"]
             sections.append((name, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes)))
         elif pc_idx is not None:
-            name = slug.replace("-", " ").title()
+            name = theater["fallback_name"]
             sections.append((name, render_theater_fallback(name, pc_idx)))
         else:
             sections.append((
