@@ -40,6 +40,39 @@ header h1 {
   margin-top: 0;
 }
 
+.filters {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.filters input,
+.filters select {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.filters input[type="search"] {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.filters select {
+  flex: 0 1 220px;
+}
+
+#no-results {
+  color: var(--muted);
+  font-style: italic;
+  margin: 2rem 0;
+}
+
 .theater {
   margin: 2rem 0;
   padding-bottom: 1rem;

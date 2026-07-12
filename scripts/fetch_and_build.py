@@ -269,7 +269,8 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
     rows = []
     for cinema, title, rating, runtime, badge, imdb, showtimes in rows_data:
         rows.append(
-            f'<tr><td class="title" data-label="Movie">{html.escape(title)}{imdb} {badge}</td>'
+            f'<tr data-title="{html.escape(title.lower())}" data-cinema="{html.escape(cinema.lower())}">'
+            f'<td class="title" data-label="Movie">{html.escape(title)}{imdb} {badge}</td>'
             f'<td class="meta" data-label="Rating / Runtime">{html.escape(rating)} &middot; {html.escape(runtime)}</td>'
             f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
             f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
@@ -284,7 +285,7 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
             f"not found on ClickTheCity.</p>"
         )
     return f"""
-    <section class="theater">
+    <section class="theater" data-theater="{html.escape(name)}">
       <h2>{html.escape(name)}</h2>
       <p class="address">{html.escape(address)}</p>
       <p class="source-note">{source_note}</p>
@@ -306,14 +307,15 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
         imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         showtimes = ", ".join(sorted(entry["showtimes"]))
         rows.append(
-            f'<tr><td class="title" data-label="Movie">{title}{imdb}</td>'
+            f'<tr data-title="{html.escape(entry["raw_title"].lower())}" data-cinema="">'
+            f'<td class="title" data-label="Movie">{title}{imdb}</td>'
             f'<td class="meta" data-label="Rating / Runtime">&mdash;</td>'
             f'<td class="cinema" data-label="Cinema">&mdash;</td>'
             f'<td class="showtimes" data-label="Showtimes">{showtimes}</td></tr>'
         )
     rows_html = "\n".join(rows) if rows else '<tr><td colspan="4" class="empty">No schedule available today.</td></tr>'
     return f"""
-    <section class="theater">
+    <section class="theater" data-theater="{html.escape(name_hint)}">
       <h2>{html.escape(name_hint)}</h2>
       <p class="source-note theater-error">ClickTheCity unavailable today &mdash; showing popcorn.app data only (no per-screen breakdown, ratings/runtime not provided by this source).</p>
       <table>
@@ -363,7 +365,11 @@ def build(date: str) -> str:
                 f'<code>{html.escape(slug)}</code> today (both sources failed).</p></section>',
             ))
     sections.sort(key=lambda s: natural_sort_key(s[0]))
+    theater_names = [name for name, _ in sections]
     sections = [html_str for _, html_str in sections]
+    theater_options = "\n".join(
+        f'<option value="{html.escape(n)}">{html.escape(n)}</option>' for n in theater_names
+    )
     now = datetime.datetime.now(MANILA).strftime("%Y-%m-%d %H:%M %Z")
     return f"""<!doctype html>
 <html lang="en">
@@ -378,6 +384,14 @@ def build(date: str) -> str:
   <h1>Now Showing</h1>
   <p class="updated">Schedules for {date} &middot; last updated {now}</p>
 </header>
+<div class="filters">
+  <input type="search" id="movie-filter" placeholder="Filter by movie&hellip;" aria-label="Filter by movie">
+  <select id="cinema-filter" aria-label="Filter by movie house">
+    <option value="">All movie houses</option>
+    {theater_options}
+  </select>
+</div>
+<p id="no-results" hidden>No showings match your filters.</p>
 <main>
 {''.join(sections)}
 </main>
@@ -385,6 +399,45 @@ def build(date: str) -> str:
   <p>Sources: <a href="https://clickthecity.com">ClickTheCity</a> &amp; <a href="https://www.popcorn.app">popcorn.app</a>, cross-referenced. Refreshed 3x daily.</p>
   <p>Built by <a href="https://ngpestelos.com">ngpestelos.com</a></p>
 </footer>
+<script>
+(function() {{
+  var movieInput = document.getElementById('movie-filter');
+  var cinemaSelect = document.getElementById('cinema-filter');
+  var noResults = document.getElementById('no-results');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main > section.theater[data-theater]'));
+
+  function applyFilters() {{
+    var movieQuery = movieInput.value.trim().toLowerCase();
+    var cinemaChoice = cinemaSelect.value;
+    var anySectionVisible = false;
+
+    sections.forEach(function(section) {{
+      var theaterName = section.dataset.theater;
+      if (cinemaChoice && cinemaChoice !== theaterName) {{
+        section.hidden = true;
+        return;
+      }}
+
+      var rows = Array.prototype.slice.call(section.querySelectorAll('tbody tr[data-title]'));
+      var anyRowVisible = false;
+      rows.forEach(function(row) {{
+        var match = !movieQuery || row.dataset.title.indexOf(movieQuery) !== -1;
+        row.hidden = !match;
+        if (match) anyRowVisible = true;
+      }});
+
+      var sectionVisible = rows.length === 0 || anyRowVisible;
+      section.hidden = !sectionVisible;
+      if (sectionVisible) anySectionVisible = true;
+    }});
+
+    noResults.hidden = anySectionVisible;
+  }}
+
+  movieInput.addEventListener('input', applyFilters);
+  cinemaSelect.addEventListener('change', applyFilters);
+}})();
+</script>
 </body>
 </html>
 """
