@@ -39,6 +39,7 @@ THEATERS = [
         "ctc_slug": "sm-megamall",
         "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-megamall/cinema/2763",
         "fallback_name": "SM MegaMall",  # matches ClickTheCity's own name
+        "display_name": "SM Megamall",  # override CTC's "SM MegaMall" casing
     },
 ]
 
@@ -408,10 +409,10 @@ def build(date: str) -> str:
                 )
             else:
                 source_note = "Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today"
-            name = ctc_data["theater"]["name"]
+            name = theater.get("display_name") or ctc_data["theater"]["name"]
             sections.append((name, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes)))
         elif pc_idx is not None:
-            name = theater["fallback_name"]
+            name = theater.get("display_name") or theater["fallback_name"]
             sections.append((name, render_theater_fallback(name, pc_idx)))
         else:
             sections.append((
