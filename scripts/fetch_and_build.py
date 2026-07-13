@@ -41,6 +41,12 @@ THEATERS = [
         "fallback_name": "SM MegaMall",  # matches ClickTheCity's own name
         "display_name": "SM Megamall",  # override CTC's "SM MegaMall" casing
     },
+    {
+        "ctc_slug": "sm-city-north-edsa",
+        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-north-edsa/cinema/512",
+        "fallback_name": "SM City North EDSA",  # matches ClickTheCity's own name
+        "display_name": "SM North EDSA",  # drop "City" for a shorter label
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own

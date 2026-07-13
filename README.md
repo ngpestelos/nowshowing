@@ -23,6 +23,7 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | Ortigas Cinemas Estancia (Capitol Commons) | `ortigas-cinemas-estancia` | `/ph/ortigas-cinema/estancia-cinemas/cinema/2766` |
 | Robinsons Place Manila (Ermita) | `robinsons-place-manila` | `/ph/robinsons/manila/cinema/552` |
 | SM Megamall (Mandaluyong) | `sm-megamall` | `/ph/sm-cinemas/sm-city-megamall/cinema/2763` |
+| SM North EDSA (Quezon City) | `sm-city-north-edsa` | `/ph/sm-cinemas/sm-city-north-edsa/cinema/512` |
 
 Add more by appending a `{"ctc_slug": ..., "popcorn_url": ...}` entry to `THEATERS` in `scripts/fetch_and_build.py`. Find a ClickTheCity slug by trying `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's right); find a popcorn.app URL by searching `site:popcorn.app "<mall name>"`.
 
