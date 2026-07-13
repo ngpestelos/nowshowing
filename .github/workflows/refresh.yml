@@ -3,9 +3,9 @@ name: Refresh schedules
 on:
   schedule:
     # Asia/Manila (UTC+8) is 8h ahead of UTC
-    - cron: "0 22 * * *"  # 06:00 Manila
-    - cron: "0 5 * * *"   # 13:00 Manila
-    - cron: "0 11 * * *"  # 19:00 Manila
+    - cron: "17 22 * * *"  # 06:17 Manila (off minute 0 to dodge GH cron congestion)
+    - cron: "17 5 * * *"   # 13:17 Manila
+    - cron: "17 11 * * *"  # 19:17 Manila
   workflow_dispatch: {}
 
 permissions:
