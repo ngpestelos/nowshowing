@@ -35,6 +35,11 @@ THEATERS = [
         "popcorn_url": "https://www.popcorn.app/ph/robinsons/manila/cinema/552",
         "fallback_name": "Robinsons Place Manila",
     },
+    {
+        "ctc_slug": "sm-megamall",
+        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-megamall/cinema/2763",
+        "fallback_name": "SM MegaMall",  # matches ClickTheCity's own name
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own
