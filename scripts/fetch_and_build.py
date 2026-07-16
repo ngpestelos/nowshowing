@@ -54,6 +54,11 @@ THEATERS = [
         "popcorn_url": "https://www.popcorn.app/ph/sm-cinema/podium/cinema/517",
         "fallback_name": "The Podium",  # matches ClickTheCity's own name
     },
+    {
+        "ctc_slug": "greenbelt-3",
+        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/greenbelt-3/cinema/543",
+        "fallback_name": "Greenbelt 3",
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own
