@@ -64,6 +64,12 @@ THEATERS = [
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/glorietta-4/cinema/541",
         "fallback_name": "Glorietta 4",
     },
+    {
+        "ctc_slug": "the-landmark-trinoma",
+        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/trinoma/cinema/548",
+        "fallback_name": "The Landmark Trinoma",
+        "display_name": "Trinoma",
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own

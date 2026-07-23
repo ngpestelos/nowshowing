@@ -27,6 +27,7 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | The Podium (Ortigas Center) | `the-podium` | `/ph/sm-cinema/podium/cinema/517` |
 | Greenbelt 3 (Ayala Center) | `greenbelt-3` | `/ph/ayala-malls-cinemas/greenbelt-3/cinema/543` |
 | Glorietta 4 | `glorietta-4` | `/ph/ayala-malls-cinemas/glorietta-4/cinema/541` |
+| Trinoma | `the-landmark-trinoma` | `/ph/ayala-malls-cinemas/trinoma/cinema/548` |
 
 Add more by appending a `{"ctc_slug": ..., "popcorn_url": ...}` entry to `THEATERS` in `scripts/fetch_and_build.py`. Find a ClickTheCity slug by trying `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's right); find a popcorn.app URL by searching `site:popcorn.app "<mall name>"`.
 
