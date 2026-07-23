@@ -59,6 +59,11 @@ THEATERS = [
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/greenbelt-3/cinema/543",
         "fallback_name": "Greenbelt 3",
     },
+    {
+        "ctc_slug": "glorietta-4",
+        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/glorietta-4/cinema/541",
+        "fallback_name": "Glorietta 4",
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own
