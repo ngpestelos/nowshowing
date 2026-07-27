@@ -70,6 +70,12 @@ THEATERS = [
         "fallback_name": "TriNoma Mall",
         "display_name": "Trinoma",
     },
+    {
+        "ctc_slug": "up-town-center",
+        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/up-town-center/cinema/549",
+        "fallback_name": "Ayala U.P. Town Center",
+        "display_name": "UP Town Center",
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own
