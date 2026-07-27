@@ -65,9 +65,9 @@ THEATERS = [
         "fallback_name": "Glorietta 4",
     },
     {
-        "ctc_slug": "the-landmark-trinoma",
+        "ctc_slug": "trinoma-mall",
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/trinoma/cinema/548",
-        "fallback_name": "The Landmark Trinoma",
+        "fallback_name": "TriNoma Mall",
         "display_name": "Trinoma",
     },
 ]
