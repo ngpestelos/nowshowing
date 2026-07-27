@@ -1,6 +1,6 @@
 # Now Showing
 
-Static, auto-refreshing page of today's movie schedules for a small list of Metro Manila theaters. Published at [nowshowing.ngpcloud.org](https://nowshowing.ngpcloud.org) via Cloudflare Workers (static assets).
+Static, auto-refreshing page of today's movie schedules for a small list of Metro Manila and Iloilo theaters. Published at [nowshowing.ngpcloud.org](https://nowshowing.ngpcloud.org) via Cloudflare Workers (static assets).
 
 ## How it works
 
@@ -29,6 +29,11 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | Glorietta 4 | `glorietta-4` | `/ph/ayala-malls-cinemas/glorietta-4/cinema/541` |
 | Trinoma | `trinoma-mall` | `/ph/ayala-malls-cinemas/trinoma/cinema/548` |
 | UP Town Center | `up-town-center` | `/ph/ayala-malls-cinemas/up-town-center/cinema/549` |
+| SM City Iloilo | `sm-city-iloilo` | `/ph/sm-cinemas/sm-city-iloilo/cinema/2764` |
+| Robinsons Place Iloilo | `robinsons-place-iloilo` | `/ph/robinsons-movieworld/place-iloilo/cinema/553` |
+| Robinsons Place Jaro | `robinsons-place-jaro` | `/ph/robinsons-movieworld/place-jaro/cinema/555` |
+| Festive Walk Iloilo | `festive-walk-iloilo` | `/ph/megaworld-cinemas/festive-walk-iloilo/cinema/2765` |
+| Vista Mall Iloilo | `vista-mall-iloilo` | `/ph/vista-cinema/vista-mall-iloilo/cinema/2766` |
 
 Add more by appending a `{"ctc_slug": ..., "popcorn_url": ...}` entry to `THEATERS` in `scripts/fetch_and_build.py`. Find a ClickTheCity slug by trying `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's right); find a popcorn.app URL by searching `site:popcorn.app "<mall name>"`.
 

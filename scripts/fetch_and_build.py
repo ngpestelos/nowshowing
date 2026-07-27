@@ -76,6 +76,31 @@ THEATERS = [
         "fallback_name": "Ayala U.P. Town Center",
         "display_name": "UP Town Center",
     },
+    {
+        "ctc_slug": "sm-city-iloilo",
+        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-iloilo/cinema/2764",
+        "fallback_name": "SM City Iloilo",
+    },
+    {
+        "ctc_slug": "robinsons-place-iloilo",
+        "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/place-iloilo/cinema/553",
+        "fallback_name": "Robinsons Place Iloilo",
+    },
+    {
+        "ctc_slug": "robinsons-place-jaro",
+        "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/place-jaro/cinema/555",
+        "fallback_name": "Robinsons Place Jaro",
+    },
+    {
+        "ctc_slug": "festive-walk-iloilo",
+        "popcorn_url": "https://www.popcorn.app/ph/megaworld-cinemas/festive-walk-iloilo/cinema/2765",
+        "fallback_name": "Festive Walk Iloilo",
+    },
+    {
+        "ctc_slug": "vista-mall-iloilo",
+        "popcorn_url": "https://www.popcorn.app/ph/vista-cinema/vista-mall-iloilo/cinema/2766",
+        "fallback_name": "Vista Mall Iloilo",
+    },
 ]
 
 # Per-seat ticket prices (PHP), verified directly against each operator's own
