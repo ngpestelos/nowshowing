@@ -35,7 +35,21 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | Festive Walk Iloilo | `festive-walk-iloilo` | `None` (ClickTheCity only) |
 | Vista Mall Iloilo | `vista-mall-iloilo` | `None` (ClickTheCity only) |
 
-Add more by appending a `{"ctc_slug": ..., "popcorn_url": ...}` entry to `THEATERS` in `scripts/fetch_and_build.py`. Find a ClickTheCity slug by trying `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's right); find a popcorn.app URL by searching `site:popcorn.app "<mall name>"`.
+### Adding new theaters
+
+Add entries to `THEATERS` in `scripts/fetch_and_build.py`:
+
+```python
+{
+    "ctc_slug": "sm-city-iloilo",
+    "fallback_name": "SM City Iloilo",
+    # "popcorn_url": optional — omit or set None if untracked on popcorn.app
+}
+```
+
+1. **Find ClickTheCity slug:** Probe `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's valid).
+2. **Find popcorn.app URL:** Search `site:popcorn.app "<mall name>"`. Verify the page `<title>` tag contains matching theater keywords (e.g., `curl -s "<url>" | grep -i "<title>"`). Never guess numeric cinema IDs in `/cinema/XXXX`. Omit `popcorn_url` if popcorn.app does not index the theater.
+3. **Automated validation guard:** `fetch_popcorn()` in `scripts/fetch_and_build.py` automatically verifies the fetched page's `<title>` tag against expected keywords. If a title mismatch occurs (e.g., wrong cinema ID or 404 page), it logs a warning and safely drops popcorn cross-checking (`None`) to prevent cross-referencing against the wrong cinema.
 
 ## Local run
 
