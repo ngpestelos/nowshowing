@@ -78,27 +78,22 @@ THEATERS = [
     },
     {
         "ctc_slug": "sm-city-iloilo",
-        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-iloilo/cinema/2764",
         "fallback_name": "SM City Iloilo",
     },
     {
         "ctc_slug": "robinsons-place-iloilo",
-        "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/place-iloilo/cinema/553",
         "fallback_name": "Robinsons Place Iloilo",
     },
     {
         "ctc_slug": "robinsons-place-jaro",
-        "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/place-jaro/cinema/555",
         "fallback_name": "Robinsons Place Jaro",
     },
     {
         "ctc_slug": "festive-walk-iloilo",
-        "popcorn_url": "https://www.popcorn.app/ph/megaworld-cinemas/festive-walk-iloilo/cinema/2765",
         "fallback_name": "Festive Walk Iloilo",
     },
     {
         "ctc_slug": "vista-mall-iloilo",
-        "popcorn_url": "https://www.popcorn.app/ph/vista-cinema/vista-mall-iloilo/cinema/2766",
         "fallback_name": "Vista Mall Iloilo",
     },
 ]
@@ -282,7 +277,9 @@ def ctc_index(data: dict, date: str) -> dict:
 
 # --- popcorn.app (secondary/cross-check) --------------------------------
 
-def fetch_popcorn(url: str) -> dict | None:
+def fetch_popcorn(url: str | None) -> dict | None:
+    if not url:
+        return None
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     try:
         with urllib.request.urlopen(req, timeout=20) as resp:
@@ -453,7 +450,7 @@ def build(date: str) -> str:
     for theater in THEATERS:
         slug = theater["ctc_slug"]
         ctc_data = fetch_ctc(slug, date)
-        pc_raw = fetch_popcorn(theater["popcorn_url"])
+        pc_raw = fetch_popcorn(theater.get("popcorn_url"))
         pc_idx = popcorn_index(pc_raw, date) if pc_raw is not None else None
 
         if ctc_data is not None:
@@ -492,7 +489,7 @@ def build(date: str) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Now Showing — Metro Manila</title>
+<title>Now Showing — Metro Manila &amp; Iloilo</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
