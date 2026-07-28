@@ -49,10 +49,7 @@ THEATERS = [
     },
     {
         "ctc_slug": "the-podium",
-        # SM-managed; popcorn.app has no parser-readable page for it today
-        # (no allShowtimes blob), so it renders ClickTheCity-only.
-        "popcorn_url": "https://www.popcorn.app/ph/sm-cinema/podium/cinema/517",
-        "fallback_name": "The Podium",  # matches ClickTheCity's own name
+        "fallback_name": "The Podium",  # matches ClickTheCity's own name (untracked on popcorn.app)
     },
     {
         "ctc_slug": "greenbelt-3",

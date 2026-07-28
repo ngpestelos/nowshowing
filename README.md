@@ -24,7 +24,7 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | Robinsons Place Manila (Ermita) | `robinsons-place-manila` | `/ph/robinsons/manila/cinema/552` |
 | SM Megamall (Mandaluyong) | `sm-megamall` | `/ph/sm-cinemas/sm-city-megamall/cinema/2763` |
 | SM North EDSA (Quezon City) | `sm-city-north-edsa` | `/ph/sm-cinemas/sm-city-north-edsa/cinema/512` |
-| The Podium (Ortigas Center) | `the-podium` | `/ph/sm-cinema/podium/cinema/517` |
+| The Podium (Ortigas Center) | `the-podium` | `None` (ClickTheCity only) |
 | Greenbelt 3 (Ayala Center) | `greenbelt-3` | `/ph/ayala-malls-cinemas/greenbelt-3/cinema/543` |
 | Glorietta 4 | `glorietta-4` | `/ph/ayala-malls-cinemas/glorietta-4/cinema/541` |
 | Trinoma | `trinoma-mall` | `/ph/ayala-malls-cinemas/trinoma/cinema/548` |
