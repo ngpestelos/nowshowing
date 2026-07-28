@@ -277,7 +277,7 @@ def ctc_index(data: dict, date: str) -> dict:
 
 # --- popcorn.app (secondary/cross-check) --------------------------------
 
-def fetch_popcorn(url: str | None) -> dict | None:
+def fetch_popcorn(url: str | None, expected_name: str | None = None) -> dict | None:
     if not url:
         return None
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -287,6 +287,21 @@ def fetch_popcorn(url: str | None) -> dict | None:
     except Exception as e:
         print(f"WARN: popcorn.app fetch failed for {url}: {e}")
         return None
+
+    if expected_name:
+        title_m = re.search(r"<title>([^<]+)</title>", page, re.IGNORECASE)
+        page_title = title_m.group(1).lower() if title_m else ""
+        ignore_words = {"mall", "malls", "place", "city", "cinemas", "cinema", "ayala"}
+        name_words = [
+            w for w in re.findall(r"\w+", expected_name.lower())
+            if len(w) >= 3 and w not in ignore_words
+        ]
+        if name_words and not any(w in page_title for w in name_words):
+            print(
+                f"WARN: popcorn.app title mismatch for {url}: expected keywords {name_words} "
+                f"in page title {page_title!r} (expected {expected_name!r})"
+            )
+            return None
     marker = "allShowtimes: "
     start = page.find(marker)
     if start == -1:
@@ -449,8 +464,9 @@ def build(date: str) -> str:
     sections = []  # list of (display_name, html) — sorted by name before assembly
     for theater in THEATERS:
         slug = theater["ctc_slug"]
+        expected_name = theater.get("display_name") or theater["fallback_name"]
         ctc_data = fetch_ctc(slug, date)
-        pc_raw = fetch_popcorn(theater.get("popcorn_url"))
+        pc_raw = fetch_popcorn(theater.get("popcorn_url"), expected_name=expected_name)
         pc_idx = popcorn_index(pc_raw, date) if pc_raw is not None else None
 
         if ctc_data is not None:
