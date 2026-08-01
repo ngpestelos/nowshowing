@@ -14,84 +14,107 @@ import re
 import urllib.request
 import zoneinfo
 
+CITIES = (
+    ("metro-manila", "Metro Manila"),
+    ("iloilo", "Iloilo"),
+)
+DEFAULT_CITY = "metro-manila"
+CITY_KEYS = {k for k, _ in CITIES}
+
 THEATERS = [
     {
         "ctc_slug": "robinsons-galleria-ortigas",
         "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/galleria-ortigas/cinema/550",
         "fallback_name": "Robinsons Galleria Ortigas",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "power-plant-mall",
         "popcorn_url": "https://www.popcorn.app/ph/powerplant/power-plant-mall/cinema/2633",
         "fallback_name": "Power Plant",  # matches ClickTheCity's own name, NOT slug.title() ("Power Plant Mall")
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "ortigas-cinemas-estancia",
         "popcorn_url": "https://www.popcorn.app/ph/ortigas-cinema/estancia-cinemas/cinema/2766",
         "fallback_name": "Ortigas Cinemas Estancia",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "robinsons-place-manila",
         "popcorn_url": "https://www.popcorn.app/ph/robinsons/manila/cinema/552",
         "fallback_name": "Robinsons Place Manila",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "sm-megamall",
         "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-megamall/cinema/2763",
         "fallback_name": "SM MegaMall",  # matches ClickTheCity's own name
         "display_name": "SM Megamall",  # override CTC's "SM MegaMall" casing
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "sm-city-north-edsa",
         "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-north-edsa/cinema/512",
         "fallback_name": "SM City North EDSA",  # matches ClickTheCity's own name
         "display_name": "SM North EDSA",  # drop "City" for a shorter label
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "the-podium",
         "fallback_name": "The Podium",  # matches ClickTheCity's own name (untracked on popcorn.app)
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "greenbelt-3",
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/greenbelt-3/cinema/543",
         "fallback_name": "Greenbelt 3",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "glorietta-4",
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/glorietta-4/cinema/541",
         "fallback_name": "Glorietta 4",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "trinoma-mall",
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/trinoma/cinema/548",
         "fallback_name": "TriNoma Mall",
         "display_name": "Trinoma",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "up-town-center",
         "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/up-town-center/cinema/549",
         "fallback_name": "Ayala U.P. Town Center",
         "display_name": "UP Town Center",
+        "city": "metro-manila",
     },
     {
         "ctc_slug": "sm-city-iloilo",
         "fallback_name": "SM City Iloilo",
+        "city": "iloilo",
     },
     {
         "ctc_slug": "robinsons-place-iloilo",
         "fallback_name": "Robinsons Place Iloilo",
+        "city": "iloilo",
     },
     {
         "ctc_slug": "robinsons-place-jaro",
         "fallback_name": "Robinsons Place Jaro",
+        "city": "iloilo",
     },
     {
         "ctc_slug": "festive-walk-iloilo",
         "fallback_name": "Festive Walk Iloilo",
+        "city": "iloilo",
     },
     {
         "ctc_slug": "vista-mall-iloilo",
         "fallback_name": "Vista Mall Iloilo",
+        "city": "iloilo",
     },
 ]
 
@@ -370,7 +393,7 @@ def cross_check_badge(ctc_times: set, pc_entry: dict | None, now_minutes: int) -
     return f'<span class="badge badge-mismatch" title="Both sources list this movie but upcoming showtimes differ{elapsed_note}">sources disagree</span>'
 
 
-def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_note: str, now_minutes: int) -> str:
+def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_note: str, now_minutes: int, city: str) -> str:
     pc_idx = pc if pc is not None else {}
     rows_data = []
     for key, entry in ctc.items():
@@ -408,7 +431,7 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
         '<p class="source-note">No verified ticket-price source for this theater.</p>'
     )
     return f"""
-    <section class="theater" data-theater="{html.escape(name)}">
+    <section class="theater" data-theater="{html.escape(name)}" data-city="{html.escape(city)}">
       <h2>{html.escape(name)}</h2>
       <p class="address">{html.escape(address)}</p>
       <p class="source-note">{source_note}</p>
@@ -424,7 +447,7 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
     """
 
 
-def render_theater_fallback(name_hint: str, pc: dict) -> str:
+def render_theater_fallback(name_hint: str, pc: dict, city: str) -> str:
     rows = []
     for entry in sorted(pc.values(), key=lambda e: e["raw_title"].lower()):
         title = html.escape(entry["raw_title"])
@@ -440,7 +463,7 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
         )
     rows_html = "\n".join(rows) if rows else '<tr><td colspan="5" class="empty">No schedule available today.</td></tr>'
     return f"""
-    <section class="theater" data-theater="{html.escape(name_hint)}">
+    <section class="theater" data-theater="{html.escape(name_hint)}" data-city="{html.escape(city)}">
       <h2>{html.escape(name_hint)}</h2>
       <p class="source-note theater-error">ClickTheCity unavailable today &mdash; showing popcorn.app data only (no per-screen breakdown, ratings/runtime not provided by this source).</p>
       <table>
@@ -456,11 +479,15 @@ def render_theater_fallback(name_hint: str, pc: dict) -> str:
 def build(date: str) -> str:
     global _imdb_year_hint
     _imdb_year_hint = int(date[:4])
+    for t in THEATERS:
+        if t.get("city") not in CITY_KEYS:
+            raise ValueError(f"theater {t.get('ctc_slug')!r} has invalid city {t.get('city')!r}")
     now_dt = datetime.datetime.now(MANILA)
     now_minutes = now_dt.hour * 60 + now_dt.minute
-    sections = []  # list of (display_name, html) — sorted by name before assembly
+    sections = []  # list of (display_name, city, html) — sorted by name before assembly
     for theater in THEATERS:
         slug = theater["ctc_slug"]
+        city = theater["city"]
         expected_name = theater.get("display_name") or theater["fallback_name"]
         ctc_data = fetch_ctc(slug, date)
         pc_raw = fetch_popcorn(theater.get("popcorn_url"), expected_name=expected_name)
@@ -480,22 +507,30 @@ def build(date: str) -> str:
             else:
                 source_note = "Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today"
             name = theater.get("display_name") or ctc_data["theater"]["name"]
-            sections.append((name, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes)))
+            sections.append((name, city, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes, city)))
         elif pc_idx is not None:
             name = theater.get("display_name") or theater["fallback_name"]
-            sections.append((name, render_theater_fallback(name, pc_idx)))
+            sections.append((name, city, render_theater_fallback(name, pc_idx, city)))
         else:
+            name = expected_name
             sections.append((
-                slug,
-                f'<section class="theater theater-error"><p>Could not load schedule for '
-                f'<code>{html.escape(slug)}</code> today (both sources failed).</p></section>',
+                name,
+                city,
+                f'<section class="theater theater-error" data-theater="{html.escape(name)}" data-city="{html.escape(city)}">'
+                f'<p>Could not load schedule for <strong>{html.escape(name)}</strong> today '
+                f'(both sources failed).</p></section>',
             ))
     sections.sort(key=lambda s: natural_sort_key(s[0]))
-    theater_names = [name for name, _ in sections]
-    sections = [html_str for _, html_str in sections]
+    theater_entries = [(name, city) for name, city, _ in sections]
+    sections = [html_str for _, _, html_str in sections]
     theater_options = "\n".join(
-        f'<option value="{html.escape(n)}">{html.escape(n)}</option>' for n in theater_names
+        f'<option value="{html.escape(n)}" data-city="{html.escape(c)}">{html.escape(n)}</option>'
+        for n, c in theater_entries
     )
+    city_options = "\n".join(
+        f'<option value="{html.escape(k)}">{html.escape(label)}</option>' for k, label in CITIES
+    )
+    default_city = DEFAULT_CITY
     now = datetime.datetime.now(MANILA).strftime("%Y-%m-%d %H:%M %Z")
     return f"""<!doctype html>
 <html lang="en">
@@ -506,9 +541,17 @@ def build(date: str) -> str:
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <h1>Now Showing</h1>
-  <p class="updated">Schedules for {date} &middot; last updated {now}</p>
+<header class="site-header">
+  <div class="header-text">
+    <h1>Now Showing</h1>
+    <p class="updated">Schedules for {date} &middot; last updated {now}</p>
+  </div>
+  <label class="city-filter">
+    <span class="visually-hidden">City</span>
+    <select id="city-filter" aria-label="Filter by city">
+      {city_options}
+    </select>
+  </label>
 </header>
 <div class="filters">
   <input type="search" id="movie-filter" placeholder="Filter by movie&hellip;" aria-label="Filter by movie">
@@ -528,18 +571,90 @@ def build(date: str) -> str:
 <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top">&uarr;</button>
 <script>
 (function() {{
+  var DEFAULT_CITY = {json.dumps(default_city)};
   var movieInput = document.getElementById('movie-filter');
   var cinemaSelect = document.getElementById('cinema-filter');
+  var citySelect = document.getElementById('city-filter');
   var noResults = document.getElementById('no-results');
   var backToTop = document.getElementById('back-to-top');
   var sections = Array.prototype.slice.call(document.querySelectorAll('main > section.theater[data-theater]'));
+  var allOption = cinemaSelect.querySelector('option[value=""]');
+  var allCinemaOptions = Array.prototype.slice.call(cinemaSelect.querySelectorAll('option[data-city]'));
+
+  function isValidCity(city) {{
+    return city === 'metro-manila' || city === 'iloilo';
+  }}
+
+  function resolveCity() {{
+    try {{
+      var params = new URLSearchParams(window.location.search);
+      var fromUrl = params.get('city');
+      if (isValidCity(fromUrl)) return fromUrl;
+    }} catch (e) {{}}
+    try {{
+      var stored = localStorage.getItem('nowshowing-city');
+      if (isValidCity(stored)) return stored;
+    }} catch (e) {{}}
+    return DEFAULT_CITY;
+  }}
+
+  function persistCity(city) {{
+    try {{
+      localStorage.setItem('nowshowing-city', city);
+    }} catch (e) {{}}
+    try {{
+      var url = new URL(window.location.href);
+      if (city === DEFAULT_CITY) {{
+        url.searchParams.delete('city');
+      }} else {{
+        url.searchParams.set('city', city);
+      }}
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }} catch (e) {{}}
+  }}
+
+  function rebuildCinemaOptions(cityChoice) {{
+    var prev = cinemaSelect.value;
+    while (cinemaSelect.firstChild) {{
+      cinemaSelect.removeChild(cinemaSelect.firstChild);
+    }}
+    cinemaSelect.appendChild(allOption);
+    allCinemaOptions.forEach(function(opt) {{
+      if (opt.dataset.city === cityChoice) {{
+        cinemaSelect.appendChild(opt);
+      }}
+    }});
+    var stillValid = false;
+    Array.prototype.forEach.call(cinemaSelect.options, function(opt) {{
+      if (opt.value === prev) stillValid = true;
+    }});
+    cinemaSelect.value = stillValid ? prev : '';
+  }}
 
   function applyFilters() {{
+    var cityChoice = citySelect.value;
+    if (!isValidCity(cityChoice)) cityChoice = DEFAULT_CITY;
     var movieQuery = movieInput.value.trim().toLowerCase();
     var cinemaChoice = cinemaSelect.value;
     var anySectionVisible = false;
 
+    if (cinemaChoice) {{
+      var selectedOpt = null;
+      Array.prototype.forEach.call(cinemaSelect.options, function(opt) {{
+        if (opt.value === cinemaChoice) selectedOpt = opt;
+      }});
+      if (!selectedOpt || selectedOpt.dataset.city !== cityChoice) {{
+        cinemaSelect.value = '';
+        cinemaChoice = '';
+      }}
+    }}
+
     sections.forEach(function(section) {{
+      if (section.dataset.city !== cityChoice) {{
+        section.hidden = true;
+        return;
+      }}
+
       var theaterName = section.dataset.theater;
       if (cinemaChoice && cinemaChoice !== theaterName) {{
         section.hidden = true;
@@ -562,8 +677,22 @@ def build(date: str) -> str:
     noResults.hidden = anySectionVisible;
   }}
 
+  function setCity(city, persist) {{
+    if (!isValidCity(city)) city = DEFAULT_CITY;
+    citySelect.value = city;
+    document.body.dataset.city = city;
+    rebuildCinemaOptions(city);
+    if (persist) persistCity(city);
+    applyFilters();
+  }}
+
   movieInput.addEventListener('input', applyFilters);
   cinemaSelect.addEventListener('change', applyFilters);
+  citySelect.addEventListener('change', function() {{
+    setCity(citySelect.value, true);
+  }});
+
+  setCity(resolveCity(), false);
 
   function toggleBackToTop() {{
     if (window.pageYOffset > 300) {{

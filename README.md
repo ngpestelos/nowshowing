@@ -12,6 +12,7 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 - Each movie title links to IMDb (via IMDb's public suggestion-search endpoint, no API key). A remake/re-release exact-title-colliding with a decades-old original (e.g. "Moana" 2026 vs. 2016 vs. 1959) isn't flagged as uncertain — only one candidate is recent enough to be the one actually in cinemas. Genuine collisions (two *different* current-era films sharing an exact title, e.g. two 2025/2026 movies both called "The Furious") link to IMDb's top-ranked match but are marked "best guess" (dashed border, tooltip) rather than claimed as certain.
 - Per-seat ticket price, where verified: `THEATER_PRICING` in the script holds a **dated snapshot** (not a live daily fetch) sourced directly from each operator's own booking checkout page. Ortigas Cinemas Estancia and Power Plant Mall both run the Vista Entertainment ticketing platform (`ortigascinemas.com` / `tickets.powerplantcinema.com`) — confirmed by pulling a real session's price. A cinema room's *name* is classified into regular/premium tier by keyword (`screening room`, `vip`, `premiere`, `dolby atmos`, `imax`); Power Plant's premium rooms show "Price unavailable" since only the regular tier was verified there — not guessed. Robinsons Movieworld (Robinsons Galleria Ortigas, Robinsons Place Manila) runs a different, custom, reCAPTCHA-gated booking backend; this script won't script around a CAPTCHA, so those theaters show "Price unavailable" rather than a fabricated number.
 - A GitHub Actions workflow (`.github/workflows/refresh.yml`) runs the script 3x daily (06:00, 13:00, 19:00 Asia/Manila) and pushes `public/index.html` if it changed. Cloudflare auto-deploys on every push to `master`.
+- The page header has a **city selector** (Metro Manila / Iloilo). Each theater entry carries a required `city` field; the build emits `data-city` on sections and cinema options so the client filter (and schedule refresh) stays correct. Default is Metro Manila; choice sticks via `localStorage`, and non-default city is also reflected in `?city=`.
 - No build step, no framework, no dependencies — stdlib-only `fetch_and_build.py` writes `public/index.html` + `public/style.css`. `wrangler.jsonc` points Cloudflare's asset server at `./public` only — everything else in the repo (scripts, README, workflow) stays private, not publicly served.
 
 ## Theaters tracked
@@ -43,6 +44,7 @@ Add entries to `THEATERS` in `scripts/fetch_and_build.py`:
 {
     "ctc_slug": "sm-city-iloilo",
     "fallback_name": "SM City Iloilo",
+    "city": "iloilo",  # required: "metro-manila" or "iloilo"
     # "popcorn_url": optional — omit or set None if untracked on popcorn.app
 }
 ```
