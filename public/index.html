@@ -7,36 +7,45 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <h1>Now Showing</h1>
-  <p class="updated">Schedules for 2026-08-01 &middot; last updated 2026-08-01 20:12 PST</p>
+<header class="site-header">
+  <div class="header-text">
+    <h1>Now Showing</h1>
+    <p class="updated">Schedules for 2026-08-01 &middot; last updated 2026-08-01 20:47 PST</p>
+  </div>
+  <label class="city-filter">
+    <span class="visually-hidden">City</span>
+    <select id="city-filter" aria-label="Filter by city">
+      <option value="metro-manila">Metro Manila</option>
+<option value="iloilo">Iloilo</option>
+    </select>
+  </label>
 </header>
 <div class="filters">
   <input type="search" id="movie-filter" placeholder="Filter by movie&hellip;" aria-label="Filter by movie">
   <select id="cinema-filter" aria-label="Filter by movie house">
     <option value="">All movie houses</option>
-    <option value="Festive Walk Iloilo">Festive Walk Iloilo</option>
-<option value="Glorietta 4">Glorietta 4</option>
-<option value="Greenbelt 3">Greenbelt 3</option>
-<option value="Ortigas Cinemas Estancia">Ortigas Cinemas Estancia</option>
-<option value="Power Plant">Power Plant</option>
-<option value="Robinsons Galleria Ortigas">Robinsons Galleria Ortigas</option>
-<option value="Robinsons Place Iloilo">Robinsons Place Iloilo</option>
-<option value="Robinsons Place Jaro">Robinsons Place Jaro</option>
-<option value="Robinsons Place Manila">Robinsons Place Manila</option>
-<option value="SM City Iloilo">SM City Iloilo</option>
-<option value="SM Megamall">SM Megamall</option>
-<option value="SM North EDSA">SM North EDSA</option>
-<option value="The Podium">The Podium</option>
-<option value="Trinoma">Trinoma</option>
-<option value="UP Town Center">UP Town Center</option>
-<option value="Vista Mall Iloilo">Vista Mall Iloilo</option>
+    <option value="Festive Walk Iloilo" data-city="iloilo">Festive Walk Iloilo</option>
+<option value="Glorietta 4" data-city="metro-manila">Glorietta 4</option>
+<option value="Greenbelt 3" data-city="metro-manila">Greenbelt 3</option>
+<option value="Ortigas Cinemas Estancia" data-city="metro-manila">Ortigas Cinemas Estancia</option>
+<option value="Power Plant" data-city="metro-manila">Power Plant</option>
+<option value="Robinsons Galleria Ortigas" data-city="metro-manila">Robinsons Galleria Ortigas</option>
+<option value="Robinsons Place Iloilo" data-city="iloilo">Robinsons Place Iloilo</option>
+<option value="Robinsons Place Jaro" data-city="iloilo">Robinsons Place Jaro</option>
+<option value="Robinsons Place Manila" data-city="metro-manila">Robinsons Place Manila</option>
+<option value="SM City Iloilo" data-city="iloilo">SM City Iloilo</option>
+<option value="SM Megamall" data-city="metro-manila">SM Megamall</option>
+<option value="SM North EDSA" data-city="metro-manila">SM North EDSA</option>
+<option value="The Podium" data-city="metro-manila">The Podium</option>
+<option value="Trinoma" data-city="metro-manila">Trinoma</option>
+<option value="UP Town Center" data-city="metro-manila">UP Town Center</option>
+<option value="Vista Mall Iloilo" data-city="iloilo">Vista Mall Iloilo</option>
   </select>
 </div>
 <p id="no-results" hidden>No showings match your filters.</p>
 <main>
 
-    <section class="theater" data-theater="Festive Walk Iloilo">
+    <section class="theater" data-theater="Festive Walk Iloilo" data-city="iloilo">
       <h2>Festive Walk Iloilo</h2>
       <p class="address">Megaworld Boulevard, Iloilo Business Park, Mandurriao</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -54,7 +63,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Glorietta 4">
+    <section class="theater" data-theater="Glorietta 4" data-city="metro-manila">
       <h2>Glorietta 4</h2>
       <p class="address">5th Level Glorietta 4, Ayala Center</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/2 movies cross-verified today</p>
@@ -73,7 +82,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Greenbelt 3">
+    <section class="theater" data-theater="Greenbelt 3" data-city="metro-manila">
       <h2>Greenbelt 3</h2>
       <p class="address">Ayala Center</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/1 movies cross-verified today</p>
@@ -83,7 +92,7 @@
         <tbody>
         <tr data-title="spider-man: brand new day" data-cinema="cinema 1"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 1</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">8:35 PM, 11:40 PM</td></tr>
 <tr data-title="spider-man: brand new day" data-cinema="cinema 2"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 2</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">10:35 PM</td></tr>
-<tr data-title="spider-man: brand new day" data-cinema="cinema 3"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 3</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">12:55 PM</td></tr>
+<tr data-title="spider-man: brand new day" data-cinema="cinema 3"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 3</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">10:50 PM</td></tr>
 <tr data-title="spider-man: brand new day" data-cinema="cinema 4 (a-luxe)"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 4 (A-LUXE)</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">8:55 PM, 11:55 PM</td></tr>
 <tr data-title="spider-man: brand new day" data-cinema="cinema 5 (4dx)"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 5 (4DX)</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">9:40 PM</td></tr>
         </tbody>
@@ -91,7 +100,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Ortigas Cinemas Estancia">
+    <section class="theater" data-theater="Ortigas Cinemas Estancia" data-city="metro-manila">
       <h2>Ortigas Cinemas Estancia</h2>
       <p class="address">Meralco Ave., Capitol Commons, Ortigas Center</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/2 movies cross-verified today</p>
@@ -111,7 +120,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Power Plant">
+    <section class="theater" data-theater="Power Plant" data-city="metro-manila">
       <h2>Power Plant</h2>
       <p class="address">Rockwell Drive cor. Estrella St.</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/1 movies cross-verified today</p>
@@ -132,7 +141,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Robinsons Galleria Ortigas">
+    <section class="theater" data-theater="Robinsons Galleria Ortigas" data-city="metro-manila">
       <h2>Robinsons Galleria Ortigas</h2>
       <p class="address">EDSA cor. Ortigas Ave.</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/1 movies cross-verified today</p>
@@ -149,7 +158,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Robinsons Place Iloilo">
+    <section class="theater" data-theater="Robinsons Place Iloilo" data-city="iloilo">
       <h2>Robinsons Place Iloilo</h2>
       <p class="address">Ledesma St.</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -166,7 +175,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Robinsons Place Jaro">
+    <section class="theater" data-theater="Robinsons Place Jaro" data-city="iloilo">
       <h2>Robinsons Place Jaro</h2>
       <p class="address">E. Lopez St, Brgy. San Vicente</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -185,7 +194,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Robinsons Place Manila">
+    <section class="theater" data-theater="Robinsons Place Manila" data-city="metro-manila">
       <h2>Robinsons Place Manila</h2>
       <p class="address">Pedro Gil cor. Adriatico Sts., Ermita</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/4 movies cross-verified today</p>
@@ -205,7 +214,7 @@
       
     </section>
     
-    <section class="theater" data-theater="SM City Iloilo">
+    <section class="theater" data-theater="SM City Iloilo" data-city="iloilo">
       <h2>SM City Iloilo</h2>
       <p class="address">Benigno Aquino Ave., Diversion Road</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -223,7 +232,7 @@
       
     </section>
     
-    <section class="theater" data-theater="SM Megamall">
+    <section class="theater" data-theater="SM Megamall" data-city="metro-manila">
       <h2>SM Megamall</h2>
       <p class="address">Edsa cor. Julia Vargas Ave.</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/4 movies cross-verified today</p>
@@ -247,7 +256,7 @@
       
     </section>
     
-    <section class="theater" data-theater="SM North EDSA">
+    <section class="theater" data-theater="SM North EDSA" data-city="metro-manila">
       <h2>SM North EDSA</h2>
       <p class="address">North Ave. cor. EDSA</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/2 movies cross-verified today</p>
@@ -266,7 +275,7 @@
       
     </section>
     
-    <section class="theater" data-theater="The Podium">
+    <section class="theater" data-theater="The Podium" data-city="metro-manila">
       <h2>The Podium</h2>
       <p class="address">18 ADB Ave., Ortigas Center</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -282,7 +291,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Trinoma">
+    <section class="theater" data-theater="Trinoma" data-city="metro-manila">
       <h2>Trinoma</h2>
       <p class="address">EDSA cor. North Ave.</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/2 movies cross-verified today</p>
@@ -302,7 +311,7 @@
       
     </section>
     
-    <section class="theater" data-theater="UP Town Center">
+    <section class="theater" data-theater="UP Town Center" data-city="metro-manila">
       <h2>UP Town Center</h2>
       <p class="address">Katipunan Ave., Diliman</p>
       <p class="source-note">Sources: ClickTheCity + popcorn.app &middot; 0/1 movies cross-verified today</p>
@@ -311,7 +320,7 @@
         <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Ticket Price</th><th>Showtimes</th></tr></thead>
         <tbody>
         <tr data-title="spider-man: brand new day" data-cinema="cinema 1 (a-luxe)"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 1 (A-LUXE)</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">9:00 PM</td></tr>
-<tr data-title="spider-man: brand new day" data-cinema="cinema 2"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 2</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">8:00 PM, 11:00 PM</td></tr>
+<tr data-title="spider-man: brand new day" data-cinema="cinema 2"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 2</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">11:00 PM</td></tr>
 <tr data-title="spider-man: brand new day" data-cinema="cinema 3"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 3</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">9:30 PM</td></tr>
 <tr data-title="spider-man: brand new day" data-cinema="cinema 4 (4dx)"><td class="title" data-label="Movie">Spider-Man: Brand New Day <a class="imdb-link" href="https://www.imdb.com/title/tt22084616/" target="_blank" rel="noopener" title="View on IMDb">IMDb</a> <span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span></td><td class="meta" data-label="Rating / Runtime">PG &middot; 2 hrs 25 min</td><td class="cinema" data-label="Cinema">Cinema 4 (4DX)</td><td class="price" data-label="Ticket Price"><span class="price-unavailable" title="No verified price source for this theater/room tier">Price unavailable</span></td><td class="showtimes" data-label="Showtimes">8:15 PM</td></tr>
         </tbody>
@@ -319,7 +328,7 @@
       
     </section>
     
-    <section class="theater" data-theater="Vista Mall Iloilo">
+    <section class="theater" data-theater="Vista Mall Iloilo" data-city="iloilo">
       <h2>Vista Mall Iloilo</h2>
       <p class="address">Pres. Corazon Aquino Rd. (C1), Savannah, Brgy. Pulo Maestra Vita, Oton</p>
       <p class="source-note">Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today</p>
@@ -341,18 +350,90 @@
 <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top">&uarr;</button>
 <script>
 (function() {
+  var DEFAULT_CITY = "metro-manila";
   var movieInput = document.getElementById('movie-filter');
   var cinemaSelect = document.getElementById('cinema-filter');
+  var citySelect = document.getElementById('city-filter');
   var noResults = document.getElementById('no-results');
   var backToTop = document.getElementById('back-to-top');
   var sections = Array.prototype.slice.call(document.querySelectorAll('main > section.theater[data-theater]'));
+  var allOption = cinemaSelect.querySelector('option[value=""]');
+  var allCinemaOptions = Array.prototype.slice.call(cinemaSelect.querySelectorAll('option[data-city]'));
+
+  function isValidCity(city) {
+    return city === 'metro-manila' || city === 'iloilo';
+  }
+
+  function resolveCity() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var fromUrl = params.get('city');
+      if (isValidCity(fromUrl)) return fromUrl;
+    } catch (e) {}
+    try {
+      var stored = localStorage.getItem('nowshowing-city');
+      if (isValidCity(stored)) return stored;
+    } catch (e) {}
+    return DEFAULT_CITY;
+  }
+
+  function persistCity(city) {
+    try {
+      localStorage.setItem('nowshowing-city', city);
+    } catch (e) {}
+    try {
+      var url = new URL(window.location.href);
+      if (city === DEFAULT_CITY) {
+        url.searchParams.delete('city');
+      } else {
+        url.searchParams.set('city', city);
+      }
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    } catch (e) {}
+  }
+
+  function rebuildCinemaOptions(cityChoice) {
+    var prev = cinemaSelect.value;
+    while (cinemaSelect.firstChild) {
+      cinemaSelect.removeChild(cinemaSelect.firstChild);
+    }
+    cinemaSelect.appendChild(allOption);
+    allCinemaOptions.forEach(function(opt) {
+      if (opt.dataset.city === cityChoice) {
+        cinemaSelect.appendChild(opt);
+      }
+    });
+    var stillValid = false;
+    Array.prototype.forEach.call(cinemaSelect.options, function(opt) {
+      if (opt.value === prev) stillValid = true;
+    });
+    cinemaSelect.value = stillValid ? prev : '';
+  }
 
   function applyFilters() {
+    var cityChoice = citySelect.value;
+    if (!isValidCity(cityChoice)) cityChoice = DEFAULT_CITY;
     var movieQuery = movieInput.value.trim().toLowerCase();
     var cinemaChoice = cinemaSelect.value;
     var anySectionVisible = false;
 
+    if (cinemaChoice) {
+      var selectedOpt = null;
+      Array.prototype.forEach.call(cinemaSelect.options, function(opt) {
+        if (opt.value === cinemaChoice) selectedOpt = opt;
+      });
+      if (!selectedOpt || selectedOpt.dataset.city !== cityChoice) {
+        cinemaSelect.value = '';
+        cinemaChoice = '';
+      }
+    }
+
     sections.forEach(function(section) {
+      if (section.dataset.city !== cityChoice) {
+        section.hidden = true;
+        return;
+      }
+
       var theaterName = section.dataset.theater;
       if (cinemaChoice && cinemaChoice !== theaterName) {
         section.hidden = true;
@@ -375,8 +456,22 @@
     noResults.hidden = anySectionVisible;
   }
 
+  function setCity(city, persist) {
+    if (!isValidCity(city)) city = DEFAULT_CITY;
+    citySelect.value = city;
+    document.body.dataset.city = city;
+    rebuildCinemaOptions(city);
+    if (persist) persistCity(city);
+    applyFilters();
+  }
+
   movieInput.addEventListener('input', applyFilters);
   cinemaSelect.addEventListener('change', applyFilters);
+  citySelect.addEventListener('change', function() {
+    setCity(citySelect.value, true);
+  });
+
+  setCity(resolveCity(), false);
 
   function toggleBackToTop() {
     if (window.pageYOffset > 300) {

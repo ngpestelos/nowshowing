@@ -30,7 +30,20 @@ body {
   line-height: 1.5;
 }
 
-header h1 {
+.site-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.site-header h1 {
   margin-bottom: 0.25rem;
 }
 
@@ -38,6 +51,39 @@ header h1 {
   color: var(--muted);
   font-size: 0.9rem;
   margin-top: 0;
+}
+
+.city-filter {
+  flex: 0 0 auto;
+}
+
+.city-filter select {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Before JS (and as a FOUC guard): show Metro Manila only by default.
+   JS sets body[data-city] and drives section.hidden for cinema/movie filters. */
+body:not([data-city]) section.theater[data-city="iloilo"],
+body[data-city="metro-manila"] section.theater[data-city="iloilo"],
+body[data-city="iloilo"] section.theater[data-city="metro-manila"] {
+  display: none !important;
 }
 
 .filters {
@@ -214,7 +260,7 @@ footer a { color: inherit; }
 
 @media (max-width: 600px) {
   body { padding: 1rem; }
-  header h1 { font-size: 1.5rem; }
+  .site-header h1 { font-size: 1.5rem; }
 
   table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
