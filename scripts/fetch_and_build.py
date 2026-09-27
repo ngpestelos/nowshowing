@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch today's schedules from two independent sources, cross-reference them
-for accuracy, and rebuild index.html. ClickTheCity is primary (richer
-per-screen detail); popcorn.app is a secondary check sourced from the
-cinema operators' own booking backends — a genuinely different data
-provider, not a ClickTheCity mirror. Falls back to popcorn.app alone if
-ClickTheCity is unreachable.
-"""
+"""Fetch today's schedules from ClickTheCity and rebuild index.html."""
 import datetime
 import html
 import json
@@ -24,69 +18,59 @@ CITY_KEYS = {k for k, _ in CITIES}
 THEATERS = [
     {
         "ctc_slug": "robinsons-galleria-ortigas",
-        "popcorn_url": "https://www.popcorn.app/ph/robinsons-movieworld/galleria-ortigas/cinema/550",
         "fallback_name": "Robinsons Galleria Ortigas",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "power-plant-mall",
-        "popcorn_url": "https://www.popcorn.app/ph/powerplant/power-plant-mall/cinema/2633",
         "fallback_name": "Power Plant",  # matches ClickTheCity's own name, NOT slug.title() ("Power Plant Mall")
         "city": "metro-manila",
     },
     {
         "ctc_slug": "ortigas-cinemas-estancia",
-        "popcorn_url": "https://www.popcorn.app/ph/ortigas-cinema/estancia-cinemas/cinema/2766",
         "fallback_name": "Ortigas Cinemas Estancia",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "robinsons-place-manila",
-        "popcorn_url": "https://www.popcorn.app/ph/robinsons/manila/cinema/552",
         "fallback_name": "Robinsons Place Manila",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "sm-megamall",
-        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-megamall/cinema/2763",
         "fallback_name": "SM MegaMall",  # matches ClickTheCity's own name
         "display_name": "SM Megamall",  # override CTC's "SM MegaMall" casing
         "city": "metro-manila",
     },
     {
         "ctc_slug": "sm-city-north-edsa",
-        "popcorn_url": "https://www.popcorn.app/ph/sm-cinemas/sm-city-north-edsa/cinema/512",
         "fallback_name": "SM City North EDSA",  # matches ClickTheCity's own name
         "display_name": "SM North EDSA",  # drop "City" for a shorter label
         "city": "metro-manila",
     },
     {
         "ctc_slug": "the-podium",
-        "fallback_name": "The Podium",  # matches ClickTheCity's own name (untracked on popcorn.app)
+        "fallback_name": "The Podium",  # matches ClickTheCity's own name
         "city": "metro-manila",
     },
     {
         "ctc_slug": "greenbelt-3",
-        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/greenbelt-3/cinema/543",
         "fallback_name": "Greenbelt 3",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "glorietta-4",
-        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/glorietta-4/cinema/541",
         "fallback_name": "Glorietta 4",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "trinoma-mall",
-        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/trinoma/cinema/548",
         "fallback_name": "TriNoma Mall",
         "display_name": "Trinoma",
         "city": "metro-manila",
     },
     {
         "ctc_slug": "up-town-center",
-        "popcorn_url": "https://www.popcorn.app/ph/ayala-malls-cinemas/up-town-center/cinema/549",
         "fallback_name": "Ayala U.P. Town Center",
         "display_name": "UP Town Center",
         "city": "metro-manila",
@@ -178,12 +162,6 @@ def natural_sort_key(s: str) -> list:
     return [int(p) if p.isdigit() else p.lower() for p in re.split(r"(\d+)", s)]
 
 
-def normalize_time(t: str) -> str:
-    t = t.upper().replace(" ", "")
-    m = re.match(r"^0?(\d{1,2}):(\d{2})(AM|PM)$", t)
-    return f"{m.group(1)}:{m.group(2)}{m.group(3)}" if m else t
-
-
 IMDB_SUGGESTION_URL = "https://v3.sg.media-imdb.com/suggestion/{first_char}/{query}.json"
 _imdb_cache: dict[str, tuple[str, bool] | None] = {}
 _imdb_year_hint = None  # set once per build() run from the schedule date
@@ -242,20 +220,7 @@ def imdb_link_html(imdb: tuple | None) -> str:
     )
 
 
-def minutes_since_midnight(t: str) -> int:
-    """t must already be normalize_time()'d, e.g. '11:40AM'."""
-    m = re.match(r"^(\d{1,2}):(\d{2})(AM|PM)$", t)
-    if not m:
-        return -1
-    h, mm, ap = int(m.group(1)), int(m.group(2)), m.group(3)
-    if ap == "PM" and h != 12:
-        h += 12
-    if ap == "AM" and h == 12:
-        h = 0
-    return h * 60 + mm
-
-
-# --- ClickTheCity (primary) ---------------------------------------------
+# --- ClickTheCity ---------------------------------------------
 
 def fetch_ctc(slug: str, date: str) -> dict | None:
     url = CTC_API_URL.format(slug=slug, date=date)
@@ -273,7 +238,7 @@ def fetch_ctc(slug: str, date: str) -> dict | None:
 
 
 def ctc_index(data: dict, date: str) -> dict:
-    """normalized_title -> {raw_title, rating, runtime, cinema_rows, showtimes}"""
+    """normalized_title -> {raw_title, rating, runtime, cinema_rows}"""
     movies = {m["movieId"]: m for m in data["now_showing"]}
     index = {}
     for s in data["schedules"]:
@@ -287,143 +252,35 @@ def ctc_index(data: dict, date: str) -> dict:
             "rating": movie.get("mtrcb_rating", ""),
             "runtime": movie.get("running_time", ""),
             "cinema_rows": [],
-            "showtimes": set(),
         })
         cinema = s["theaterName"].lstrip("- ").strip()
         entry["cinema_rows"].append((cinema, s["showtimes"]))
-        entry["showtimes"].update(normalize_time(t) for t in s["showtimes"])
     return index
 
 
-# --- popcorn.app (secondary/cross-check) --------------------------------
+# --- Rendering ------------------------------------------------------------
 
-def fetch_popcorn(url: str | None, expected_name: str | None = None) -> dict | None:
-    if not url:
-        return None
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            page = resp.read().decode("utf-8", errors="replace")
-    except Exception as e:
-        print(f"WARN: popcorn.app fetch failed for {url}: {e}")
-        return None
-
-    if expected_name:
-        title_m = re.search(r"<title>([^<]+)</title>", page, re.IGNORECASE)
-        page_title = title_m.group(1).lower() if title_m else ""
-        ignore_words = {"mall", "malls", "place", "city", "cinemas", "cinema", "ayala"}
-        name_words = [
-            w for w in re.findall(r"\w+", expected_name.lower())
-            if len(w) >= 3 and w not in ignore_words
-        ]
-        if name_words and not any(w in page_title for w in name_words):
-            print(
-                f"WARN: popcorn.app title mismatch for {url}: expected keywords {name_words} "
-                f"in page title {page_title!r} (expected {expected_name!r})"
-            )
-            return None
-    marker = "allShowtimes: "
-    start = page.find(marker)
-    if start == -1:
-        print(f"WARN: popcorn.app page structure changed (no allShowtimes) for {url}")
-        return None
-    start += len(marker)
-    depth = 0
-    started = False
-    end = None
-    for i in range(start, len(page)):
-        c = page[i]
-        if c == "{":
-            depth += 1
-            started = True
-        elif c == "}":
-            depth -= 1
-            if started and depth == 0:
-                end = i + 1
-                break
-    if end is None:
-        print(f"WARN: popcorn.app JSON brace-matching failed for {url}")
-        return None
-    try:
-        return json.loads(page[start:end])
-    except json.JSONDecodeError as e:
-        print(f"WARN: popcorn.app JSON parse failed for {url}: {e}")
-        return None
-
-
-def popcorn_index(data: dict, date: str) -> dict:
-    """normalized_title -> {raw_title, showtimes}"""
-    index = {}
-    for movie in data.get(date, []):
-        raw_title = movie.get("MovieName", "")
-        key = normalize_title(raw_title)
-        entry = index.setdefault(key, {"raw_title": raw_title, "showtimes": set()})
-        for showtimes in movie.get("Cinemas", {}).values():
-            for st in showtimes:
-                t = st.get("ShowTime")
-                if t:
-                    entry["showtimes"].add(normalize_time(t))
-    return index
-
-
-# --- Cross-reference + rendering -----------------------------------------
-
-def cross_check_badge(ctc_times: set, pc_entry: dict | None, now_minutes: int) -> str:
-    if pc_entry is None:
-        return '<span class="badge badge-unverified" title="Not listed on popcorn.app">ClickTheCity only</span>'
-    pc_times = pc_entry["showtimes"]
-    if not pc_times:
-        return '<span class="badge badge-unverified" title="popcorn.app lists this movie but no showtimes">ClickTheCity only</span>'
-
-    # popcorn.app drops showtimes that have already started today; ClickTheCity
-    # always lists the full day. Compare only the still-upcoming subset so an
-    # elapsed early showtime doesn't read as a source disagreement.
-    upcoming_ctc = {t for t in ctc_times if minutes_since_midnight(t) >= now_minutes}
-    elapsed_count = len(ctc_times) - len(upcoming_ctc)
-    elapsed_note = f" ({elapsed_count} earlier showtime{'s' if elapsed_count != 1 else ''} already passed)" if elapsed_count else ""
-
-    if upcoming_ctc == pc_times:
-        return f'<span class="badge badge-verified" title="Upcoming showtimes match on both sources{elapsed_note}">verified &middot; 2 sources agree</span>'
-    overlap = upcoming_ctc & pc_times
-    if overlap:
-        return (
-            f'<span class="badge badge-partial" title="ClickTheCity (upcoming): {", ".join(sorted(upcoming_ctc)) or "none"} '
-            f'&#10;popcorn.app: {", ".join(sorted(pc_times))}{elapsed_note}">partial match &middot; {len(overlap)}/{len(upcoming_ctc | pc_times)} upcoming showtimes agree</span>'
-        )
-    return f'<span class="badge badge-mismatch" title="Both sources list this movie but upcoming showtimes differ{elapsed_note}">sources disagree</span>'
-
-
-def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_note: str, now_minutes: int, city: str) -> str:
-    pc_idx = pc if pc is not None else {}
+def render_theater(name: str, address: str, ctc: dict, city: str) -> str:
     rows_data = []
-    for key, entry in ctc.items():
-        badge = cross_check_badge(entry["showtimes"], pc_idx.get(key), now_minutes)
+    for entry in ctc.values():
         imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
         for cinema, showtimes in entry["cinema_rows"]:
-            rows_data.append((cinema, entry["raw_title"], entry["rating"], entry["runtime"], badge, imdb, showtimes))
+            rows_data.append((cinema, entry["raw_title"], entry["rating"], entry["runtime"], imdb, showtimes))
 
     # sort by cinema (natural order), then by movie name within each cinema
     rows_data.sort(key=lambda r: (natural_sort_key(r[0]), r[1].lower()))
 
     rows = []
-    for cinema, title, rating, runtime, badge, imdb, showtimes in rows_data:
+    for cinema, title, rating, runtime, imdb, showtimes in rows_data:
         rows.append(
             f'<tr data-title="{html.escape(title.lower())}" data-cinema="{html.escape(cinema.lower())}">'
-            f'<td class="title" data-label="Movie">{html.escape(title)}{imdb} {badge}</td>'
+            f'<td class="title" data-label="Movie">{html.escape(title)}{imdb}</td>'
             f'<td class="meta" data-label="Rating / Runtime">{html.escape(rating)} &middot; {html.escape(runtime)}</td>'
             f'<td class="cinema" data-label="Cinema">{html.escape(cinema)}</td>'
             f'<td class="price" data-label="Ticket Price">{price_html(name, cinema)}</td>'
             f'<td class="showtimes" data-label="Showtimes">{", ".join(showtimes)}</td></tr>'
         )
     rows_html = "\n".join(rows) if rows else '<tr><td colspan="5" class="empty">No schedule available today.</td></tr>'
-    missing_from_ctc = [e["raw_title"] for k, e in pc_idx.items() if k not in ctc]
-    extra_note = ""
-    if missing_from_ctc:
-        extra_note = (
-            f'<p class="cross-check-note">popcorn.app also lists '
-            f'{", ".join(html.escape(t) for t in missing_from_ctc)} at this theater today — '
-            f"not found on ClickTheCity.</p>"
-        )
     pricing = THEATER_PRICING.get(name)
     price_note = (
         f'<p class="source-note">Ticket prices verified {pricing["verified"]} against the operator\'s own booking site &mdash; a dated snapshot, not fetched live.</p>'
@@ -434,38 +291,7 @@ def render_theater(name: str, address: str, ctc: dict, pc: dict | None, source_n
     <section class="theater" data-theater="{html.escape(name)}" data-city="{html.escape(city)}">
       <h2>{html.escape(name)}</h2>
       <p class="address">{html.escape(address)}</p>
-      <p class="source-note">{source_note}</p>
       {price_note}
-      <table>
-        <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Ticket Price</th><th>Showtimes</th></tr></thead>
-        <tbody>
-        {rows_html}
-        </tbody>
-      </table>
-      {extra_note}
-    </section>
-    """
-
-
-def render_theater_fallback(name_hint: str, pc: dict, city: str) -> str:
-    rows = []
-    for entry in sorted(pc.values(), key=lambda e: e["raw_title"].lower()):
-        title = html.escape(entry["raw_title"])
-        imdb = imdb_link_html(imdb_lookup(entry["raw_title"]))
-        showtimes = ", ".join(sorted(entry["showtimes"]))
-        rows.append(
-            f'<tr data-title="{html.escape(entry["raw_title"].lower())}" data-cinema="">'
-            f'<td class="title" data-label="Movie">{title}{imdb}</td>'
-            f'<td class="meta" data-label="Rating / Runtime">&mdash;</td>'
-            f'<td class="cinema" data-label="Cinema">&mdash;</td>'
-            f'<td class="price" data-label="Ticket Price">{price_html(name_hint, "")}</td>'
-            f'<td class="showtimes" data-label="Showtimes">{showtimes}</td></tr>'
-        )
-    rows_html = "\n".join(rows) if rows else '<tr><td colspan="5" class="empty">No schedule available today.</td></tr>'
-    return f"""
-    <section class="theater" data-theater="{html.escape(name_hint)}" data-city="{html.escape(city)}">
-      <h2>{html.escape(name_hint)}</h2>
-      <p class="source-note theater-error">ClickTheCity unavailable today &mdash; showing popcorn.app data only (no per-screen breakdown, ratings/runtime not provided by this source).</p>
       <table>
         <thead><tr><th>Movie</th><th>Rating / Runtime</th><th>Cinema</th><th>Ticket Price</th><th>Showtimes</th></tr></thead>
         <tbody>
@@ -482,43 +308,22 @@ def build(date: str) -> str:
     for t in THEATERS:
         if t.get("city") not in CITY_KEYS:
             raise ValueError(f"theater {t.get('ctc_slug')!r} has invalid city {t.get('city')!r}")
-    now_dt = datetime.datetime.now(MANILA)
-    now_minutes = now_dt.hour * 60 + now_dt.minute
     sections = []  # list of (display_name, city, html) — sorted by name before assembly
     for theater in THEATERS:
-        slug = theater["ctc_slug"]
         city = theater["city"]
-        expected_name = theater.get("display_name") or theater["fallback_name"]
-        ctc_data = fetch_ctc(slug, date)
-        pc_raw = fetch_popcorn(theater.get("popcorn_url"), expected_name=expected_name)
-        pc_idx = popcorn_index(pc_raw, date) if pc_raw is not None else None
-
+        ctc_data = fetch_ctc(theater["ctc_slug"], date)
         if ctc_data is not None:
             ctc = ctc_index(ctc_data, date)
-            if pc_idx is not None:
-                verified = sum(
-                    1 for k, e in ctc.items()
-                    if pc_idx.get(k) and {t for t in e["showtimes"] if minutes_since_midnight(t) >= now_minutes} == pc_idx[k]["showtimes"]
-                )
-                source_note = (
-                    f"Sources: ClickTheCity + popcorn.app &middot; {verified}/{len(ctc)} movies "
-                    f"cross-verified today"
-                )
-            else:
-                source_note = "Source: ClickTheCity only &middot; popcorn.app cross-check unavailable today"
             name = theater.get("display_name") or ctc_data["theater"]["name"]
-            sections.append((name, city, render_theater(name, ctc_data["theater"]["address"], ctc, pc_idx, source_note, now_minutes, city)))
-        elif pc_idx is not None:
-            name = theater.get("display_name") or theater["fallback_name"]
-            sections.append((name, city, render_theater_fallback(name, pc_idx, city)))
+            sections.append((name, city, render_theater(name, ctc_data["theater"]["address"], ctc, city)))
         else:
-            name = expected_name
+            name = theater.get("display_name") or theater["fallback_name"]
             sections.append((
                 name,
                 city,
                 f'<section class="theater theater-error" data-theater="{html.escape(name)}" data-city="{html.escape(city)}">'
                 f'<p>Could not load schedule for <strong>{html.escape(name)}</strong> today '
-                f'(both sources failed).</p></section>',
+                f'(ClickTheCity unavailable).</p></section>',
             ))
     sections.sort(key=lambda s: natural_sort_key(s[0]))
     theater_entries = [(name, city) for name, city, _ in sections]
@@ -565,7 +370,7 @@ def build(date: str) -> str:
 {''.join(sections)}
 </main>
 <footer>
-  <p>Sources: <a href="https://www.clickthecity.com">ClickTheCity</a> &amp; <a href="https://www.popcorn.app">popcorn.app</a>, cross-referenced. Refreshed 3x daily.</p>
+  <p>Source: <a href="https://www.clickthecity.com">ClickTheCity</a>. Refreshed 3x daily.</p>
   <p>Built by <a href="https://ngpestelos.com">ngpestelos.com</a></p>
 </footer>
 <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top">&uarr;</button>
