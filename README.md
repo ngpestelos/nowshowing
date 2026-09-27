@@ -49,7 +49,7 @@ Add entries to `THEATERS` in `scripts/fetch_and_build.py`:
 }
 ```
 
-1. **Find ClickTheCity slug:** Probe `https://clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's valid).
+1. **Find ClickTheCity slug:** Probe `https://www.clickthecity.com/api/movies/theater/<guess>?date=YYYY-MM-DD` (`status: true` means it's valid).
 2. **Find popcorn.app URL:** Search `site:popcorn.app "<mall name>"`. Verify the page `<title>` tag contains matching theater keywords (e.g., `curl -s "<url>" | grep -i "<title>"`). Never guess numeric cinema IDs in `/cinema/XXXX`. Omit `popcorn_url` if popcorn.app does not index the theater.
 3. **Automated validation guard:** `fetch_popcorn()` in `scripts/fetch_and_build.py` automatically verifies the fetched page's `<title>` tag against expected keywords. If a title mismatch occurs (e.g., wrong cinema ID or 404 page), it logs a warning and safely drops popcorn cross-checking (`None`) to prevent cross-referencing against the wrong cinema.
 

@@ -151,7 +151,7 @@ def price_html(theater_name: str, cinema_name: str) -> str:
     return f"&#8369;{price:,.2f}"
 
 
-CTC_API_URL = "https://clickthecity.com/api/movies/theater/{slug}?date={date}"
+CTC_API_URL = "https://www.clickthecity.com/api/movies/theater/{slug}?date={date}"
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 MANILA = zoneinfo.ZoneInfo("Asia/Manila")
 
@@ -565,7 +565,7 @@ def build(date: str) -> str:
 {''.join(sections)}
 </main>
 <footer>
-  <p>Sources: <a href="https://clickthecity.com">ClickTheCity</a> &amp; <a href="https://www.popcorn.app">popcorn.app</a>, cross-referenced. Refreshed 3x daily.</p>
+  <p>Sources: <a href="https://www.clickthecity.com">ClickTheCity</a> &amp; <a href="https://www.popcorn.app">popcorn.app</a>, cross-referenced. Refreshed 3x daily.</p>
   <p>Built by <a href="https://ngpestelos.com">ngpestelos.com</a></p>
 </footer>
 <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top">&uarr;</button>
