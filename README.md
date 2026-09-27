@@ -5,7 +5,7 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 ## How it works
 
 - `scripts/fetch_and_build.py` pulls today's schedule from **two independent sources** per theater and cross-references them before rendering `index.html`:
-  - **ClickTheCity** (`api.clickthecity.com`) — primary, richer per-screen breakdown
+  - **ClickTheCity** (`www.clickthecity.com`) — primary, richer per-screen breakdown
   - **popcorn.app** — secondary, sourced from the cinema operators' own booking backends (not a ClickTheCity mirror)
 - Each movie gets a cross-check badge: **verified · 2 sources agree** (both list it with matching upcoming showtimes), **ClickTheCity only** (not on popcorn.app's narrower catalog), or **sources disagree** (both list it but showtimes genuinely differ). popcorn.app drops showtimes that have already started today, so the comparison only checks still-upcoming showtimes against it — an elapsed early showing doesn't get flagged as a false mismatch.
 - If ClickTheCity fails outright, the page falls back to popcorn.app alone for that theater (flagged, reduced detail — no per-screen breakdown or rating/runtime).
