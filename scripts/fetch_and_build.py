@@ -272,6 +272,8 @@ def render_theater(name: str, address: str, ctc: dict, city: str) -> str:
 
     rows = []
     for cinema, title, rating, runtime, imdb, showtimes in rows_data:
+        rating = rating if isinstance(rating, str) else ""
+        runtime = runtime if isinstance(runtime, str) else ""
         rows.append(
             f'<tr data-title="{html.escape(title.lower())}" data-cinema="{html.escape(cinema.lower())}">'
             f'<td class="title" data-label="Movie">{html.escape(title)}{imdb}</td>'
