@@ -76,6 +76,11 @@ THEATERS = [
         "city": "metro-manila",
     },
     {
+        "ctc_slug": "gateway-mall",
+        "fallback_name": "Gateway Mall",
+        "city": "metro-manila",
+    },
+    {
         "ctc_slug": "sm-city-iloilo",
         "fallback_name": "SM City Iloilo",
         "city": "iloilo",

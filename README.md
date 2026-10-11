@@ -28,11 +28,20 @@ Static, auto-refreshing page of today's movie schedules for a small list of Metr
 | Glorietta 4 | `glorietta-4` |
 | Trinoma | `trinoma-mall` |
 | UP Town Center | `up-town-center` |
+| [Gateway Mall (Cubao, Quezon City)](https://www.clickthecity.com/movies/theaters/gateway-mall) | `gateway-mall` |
 | SM City Iloilo | `sm-city-iloilo` |
 | Robinsons Place Iloilo | `robinsons-place-iloilo` |
 | Robinsons Place Jaro | `robinsons-place-jaro` |
 | Festive Walk Iloilo | `festive-walk-iloilo` |
 | Vista Mall Iloilo | `vista-mall-iloilo` |
+
+Gateway Mall is part of Araneta City's [Gateway Cineplex 18](https://www.aranetacity.com/cinema).
+ClickTheCity lists [Gateway Mall](https://www.clickthecity.com/movies/theaters/gateway-mall)
+and [Gateway Mall 2](https://www.clickthecity.com/movies/theaters/gateway-mall-2) separately.
+This list tracks `gateway-mall`; it does not combine Mall 2's rooms or schedules.
+The Gateway Mall API returned its Cubao address and schedules for October 11, 2026
+when verified with `?date=2026-10-11`. Each refresh requests the current Asia/Manila
+date and renders only schedule rows for that date.
 
 ### Adding new theaters
 
